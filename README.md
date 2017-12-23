@@ -5,6 +5,8 @@ Machine Learning Notebooks
 
 이 프로젝트는 파이썬으로 여러분들이 머신러닝의 기초를 배울 수 있도록 하였습니다. [Hands-on Machine Learning with Scikit-Learn and TensorFlow](http://shop.oreilly.com/product/0636920052289.do) 책의 Example 코드들의 대한 예시 코드들과 솔루션을 포함하고 있습니다.
 
+또한 이 레포지토리의 [Wiki](https://github.com/Hahnnz/Hands_on_ML-Kor/wiki)에 가면 해당 서적을 공부하면서 요약한 내용 또한 확인하실 수 있습니다.
+
 
 [![book](http://akamaicovers.oreilly.com/images/0636920052289/cat.gif)](http://shop.oreilly.com/product/0636920052289.do)
 
