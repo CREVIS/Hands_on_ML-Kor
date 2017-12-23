@@ -8,5 +8,5 @@ Machine Learning Notebooks
 
 [Jupyter](http://jupyter.org/) notebook들을 여러분들이 좋아하는 뷰어로 열어보세요:
 * [jupyter.org's notebook viewer](http://nbviewer.jupyter.org/github/ageron/handson-ml/blob/master/index.ipynb) 사용하기
-   * [github.com's notebook viewer](https://github.com/ageron/handson-ml/blob/master/index.ipynb)도 사용할 수 있지만, 주피터 공식 사이트 뷰어보다 느리고 수학 공식들이 제대로 보여지지 않습니다.
+    * [github.com's notebook viewer](https://github.com/ageron/handson-ml/blob/master/index.ipynb)도 사용할 수 있지만, 주피터 공식 사이트 뷰어보다 느리고 수학 공식들이 제대로 보여지지 않습니다.
 * 아니면 이 레포지토리를 다운로드해서 주피터를 직접 실행시켜서 볼 수 있습니다. 이 방법은 여러분들이 직접 코드를 가지고 실행해볼 수 있어 좋습니다. 이러한 경우, 아래의 설치 가이드를 따라 설치하셔서 사용할 수 있습니다.
