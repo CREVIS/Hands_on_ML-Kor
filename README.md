@@ -25,7 +25,7 @@ Machine Learning Notebooks
     
 만약에 이 책의 16장에 있는 강화학습을 학습하고자 하신다면, [OpenAI gym](https://gym.openai.com/docs)을 설치하고 Atari 시뮬레이션을 지원하기 위한 의존성 라이브러리들을 설치할 필요가 있습니다.
 
-혹시 여러분들이 Python에 익숙하고, Python 라이브러리 설치방법을 알고 계신다면, `requirements.txt`에 정리해놓은 라이브러리들을 설치해주시고 [Jupyter 시작하기](#Jupyter-) 섹션으로 넘어가셔도 좋습니다. 자세한 가이드가 필요하시다면 계속 읽어나가시면 됩니다.
+혹시 여러분들이 Python에 익숙하고, Python 라이브러리 설치방법을 알고 계신다면, `requirements.txt`에 정리해놓은 라이브러리들을 설치해주시고 [Jupyter 시작하기](https://github.com/Hahnnz/Hands_on_ML-Kor/blob/master/README.md#jupyter-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0) 섹션으로 넘어가셔도 좋습니다. 자세한 가이드가 필요하시다면 계속 읽어나가시면 됩니다.
 
 ## 파이썬과 필요한 라이브러리들
 당연하지만, 여러분들 분명히 파이썬이 필요할겁니다. 요새 대부분의 시스템들에는 Python2가 기본적으로 설치되어있습니다. 어떤 시스템들은 Python3도 미리 설치가 되어있습니다. 다음 명령어를 터미널에 입력하시면 여러분들의 시스템의 Python 버전을 확인하실 수 있습니다.
@@ -39,7 +39,7 @@ Python3는 ≥3.5.이라면 어느 버전이든 상관없습니다. 만약 Pytho
 
 또 다른 선택 사항으로는 [Anaconda](https://www.continuum.io/downloads)를 설치하는 것입니다. 이는 Python 2, 3버전 모두와, 많은 체계적인 라이브러리들을 포함한 패키지입니다. 여러분들은 Python3버전을 사용하시는 것을 권장드립니다.
 
-만약 Anaconda를 사용하실 것이라면,ㅜ 다음 섹션을 읽어주시고, 아니라면 [pip 사용하기](#pip-) 섹션으로 넘어가주세요
+만약 Anaconda를 사용하실 것이라면,ㅜ 다음 섹션을 읽어주시고, 아니라면 [pip 사용하기](https://github.com/Hahnnz/Hands_on_ML-Kor/blob/master/README.md#pip-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0) 섹션으로 넘어가주세요
 
 ## Anaconda 사용하기
 Anaconda를 사용할 때, 여러분들은 이 프로젝트에 맞는 독단적인 Python 환경을 추가적으로 구성해야합니다. 이는 각각의 프로젝트에 대하여 매우 다른 라이브러리들과 그 버전들로 각각 다른 환경을 구성해야하기 때문에 추천드립니다.
@@ -57,7 +57,7 @@ Anaconda를 사용할 때, 여러분들은 이 프로젝트에 맞는 독단적�
 
     $ conda install -n mlbook -c conda-forge jupyter_contrib_nbextensions
 
-모든 준비가 끝났습니다! 다음으로, [Jupyter 시작하기](#starting-jupyter)로 넘어가주세요.
+모든 준비가 끝났습니다! 다음으로, [Jupyter 시작하기](https://github.com/Hahnnz/Hands_on_ML-Kor/blob/master/README.md#jupyter-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0)로 넘어가주세요.
 
 ## pip 사용하기
 만약 Anaconda를 사용하시는 것이 아니라면, 이 프로젝트를 위해 특히 필요한 NumPy, Matplotlib, Pandas, Jupyter 그리고 TensorFlow (몇 가지 다른 것들도 )Python 라이브러리들을 설치해야합니다. 이를 위해서는, 파이썬의 집적 패키징 시스템, pip를 사용하거나, 아니면 여러분들 시스템만의 패키징 시스템을 사용해야할 지 모릅니다. (예를들어 Mac OS X의 Macport나 homebrew) pip 사용의 장점은 각각의 다양한 라이브러리들과 다양한 버전들로 여러 개의 독단적인 파이썬 가상환경을 만들기 쉽다는 점입니다. (예를 들면 한 프로젝트당 한 환경을 구현하는 것이죠.) 여러분들 시스템 고유의 패키징 시스템 사용의 장점은 여러분들의 파이썬 라이브러리들과 여러분들 시스템의 다른 패키지들 사이에 충돌을 일으킬 위험을 덜 수 있다는 것입니다. 저는 다양한 라이브러리 요구 사항들로 수많은 프로젝트를 수행해왔기 때문에, 저는 pip를 사용한 독단적인 환경을 구성하는 것을 선호합니다. 
