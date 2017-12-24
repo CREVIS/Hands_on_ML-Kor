@@ -103,7 +103,7 @@ Anaconda를 사용할 때, 여러분들은 이 프로젝트에 맞는 독단적�
 
     $ jupyter notebook
 
-이는 당신의 브라우저에 창을 띄울 것입니다. 그리고 현재 디렉토리의 컨텐츠를 보여주는 Jupyter의 트리를 볼 수 있습니다. 만약 자동으로 브라우저가 열리지 않는다면, [localhost:8888](http://localhost:8888/tree)로 들어가보세요. 이제 시작하기 위해서 `index.ipynb`를 클릭해보세요!
+이는 당신의 브라우저에 창을 띄울 것입니다. 그리고 현재 디렉토리의 컨텐츠를 보여주는 Jupyter의 트리를 볼 수 있습니다. 만약 자동으로 브라우저가 열리지 않는다면, [localhost:8888](http://localhost:8888/tree)로 들어가보세요. 이제 시작하기 위해서 [index.ipynb](https://github.com/Hahnnz/Hands_on_ML-Kor/wiki/Machine-Learning-Notebooks-(index.ipynb))를 클릭해보세요!
 
 알림 : [http://localhost:8888/nbextensions](http://localhost:8888/nbextensions)로 들어가시면 Jupyter 확장판을 구성하고 활성화 시킬 수 있습니다. 
 
