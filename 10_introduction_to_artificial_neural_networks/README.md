@@ -298,7 +298,7 @@ with tf.Session() as sess:
 이제 인공신경망 입문을 마칠 것이다. 다음의 Chapter에서는 대우 깊은 신경망을 학습시키는 방법에 대해서 얘기해볼 것이고, 다중 서버와 GPU로 학습을 분산시켜볼 것이다. 그리고나서  컨볼루션 신경망(*Convolution Neural Networks*:CNNs), 재귀 신경망(*Recurrent Neural Networks*:RNNs), 오토인코더(*autoencoder*)같이 몇가지 유명한 신경망 구조도 살펴볼 것이다.
 
 
-**[뒤로 돌아가기](../)**
+**[뒤로 돌아가기](../../../)**
 
 
 **[위로 올라가기](#chapter-10-%EC%9D%B8%EA%B3%B5%EC%8B%A0%EA%B2%BD%EB%A7%9D-%EC%9E%85%EB%AC%B8)**
