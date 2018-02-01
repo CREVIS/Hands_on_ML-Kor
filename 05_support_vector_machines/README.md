@@ -293,4 +293,6 @@ t <1이면 -1, t>1이면 0이다. t가 1인 지점에서는 미분을 할 수 �
 ["Incremental and Decremental SVM Learning"](http://goo.gl/JEqVui)나 ["Fast Kernel Classifier with Online and Active Learning"](https://goo.gl/hsoUHA)를 사용해서 실시간 커널화된 SVM을 구현하는 것도 가능하다. 하지만 이는 Matlab과 C++로 구현이 되어있다. 거대한 크기의 비선형 문제에 대해서는 우리는 아마 신경망(Neural Network를 사용해서 구현하는 것을 고려할수도 있다. (제 2장에서 다룰 예정이다)
 
 **[뒤로 돌아가기](../index.md)**
-**[위로 올라가기](https://github.com/Hahnnz/Hands_on_ML-Kor/tree/master/05_support_vector_machines#hapter-5-%EC%84%9C%ED%8F%AC%ED%8A%B8-%EB%B2%A1%ED%84%B0-%EB%A8%B8%EC%8B%A0)**
+
+
+**[위로 올라가기](https://github.com/Hahnnz/Hands_on_ML-Kor/tree/master/05_support_vector_machines#chapter-5-%EC%84%9C%ED%8F%AC%ED%8A%B8-%EB%B2%A1%ED%84%B0-%EB%A8%B8%EC%8B%A0)**
