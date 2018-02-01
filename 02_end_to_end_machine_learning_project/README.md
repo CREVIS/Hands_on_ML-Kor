@@ -1,3 +1,5 @@
+Chapter 2. 종단간 기계학습 프로젝트
+=========
 이번 chapter에서는 우리가 최근에 부동산 중개업 회사에 고용된 데이터 과학자인 마냥 종단간(end to end) 프로젝트를 수행해볼 것이다. 다음은 당신이 수행해야할 주된 단계들을 정렬해놓은 것이다.
  - 큰그림 보기
  - 데이터 가져오기
@@ -23,8 +25,8 @@
    - [데이터 세트 서브레딧](https://www.reddit.com/r/datasets)
 
 이 Chapter에서 우리는 StatLib 레포지토리의 캘리포니아 집 값 데이터 세트를 사용할 것이다. 이 데이터세트는 1990년 캘리포니아 인구조사로 나온 데이터에 기반을 한 것이다. 최근의 데이터는 아니지만, 학습에 쓰기에 질이 좋은 데이터 세트이기에 최근인 데이터 세트처럼 사용해보자. 교육 목적으로 요소(attribute)들을 좀 더 추가하였고, 몇가지 특징을 제거하였다.
-
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-1.png)
+###### 그림 2-1. 캘리포니아 집 값
+![](../Book_images/02/2-1.png)
 
 # 큰 그림을 보자
 기계학습 하우징 회사에 오신 것을 환영합니다! 당신이 처음에 해주어야할 일은 캘리포니아 인구조사 데이터 세트를 활용하여 캘리포니아 집 값에 대한 모델을 구축해야합니다. 이 데이터는 캘리포니아에서 각각의 블럭그룹(Block Group)에 대하여 블럭 그룹 지역의 인구 밀도, 중간 값의 수입, 중간 값의 집 값등으로 이루어진 행렬로 되어있다. 블럭그룹이란 미국통계청에서 샘플 데이터로 지정한 최소 지리학적 단위이다.(전형적으로 한 블럭그룹당 600~3000명 정도의 인구밀도정도를 표현해준다.) 이제 이를 그냥 짧게 "구역"이라고 하겠다.
@@ -35,8 +37,8 @@
 사장님에게 처음으로 물어볼 질문은 정확히 이 사업이 목적이 무엇인가이다. 아마 모델 구축이 최종 목표는 아닐 것이다. 회사는 이 학습 모델로 어떻게 사용하기를 원하고 어떻게 이익을 창출할지 원할까? 이는 중요한 사항인데, 이걸로 문제를 어떻게 정의할 것인지, 어떤 학습 모델을 사용할 것인지, 우리의 학습 모델을 평가하는데 어떤 수행 측정치를 사용할 것인지, 얼마나 노력을 들여서 학습시킬 지를 정하기 때문이다. 
 
 그래서 사장님은 우리의 학습모델의 결과(중간 집 값 예측)가 다른 수 많은 신호들에 따라서 또 다른 기계학습 시스템에서도 잘 될 수 있는 것을 원한다고 답했다. 이러한 후속 시스템은 주어진 지역에 투자할 가치가 있는지 없는지 정할 것이다. 이는 직접적으로 수익에 영향을 끼치기에 결과가 올바르게 나와야하는 것이 아주 중요하다.
-
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-2.png)
+###### 그림 2-2. 부동산 투자를 위한 기계 학습 파이프 라인
+![](../Book_images/02/2-2.png)
 
 다음으로 물어보아야할 짐문은 현재의 솔루션이 어떤지에 대해서이다. 이는 문제를 푸는 방법에 대한 통찰력 만큼이나 참고할 만한 행동이다. 사장님은 구역 집 값이 현재 주로 전문가들에게 평가받는다고 답할 것이다. 한 팀이 구역에 대한 최신 정보를 모으는데, 중간 집 값을 수집할 수 없을 떄에는 복잡한 규칙에 의거해 가격을 책정한다. 이는 시간도 많이 걸릴뿐더러 그 책정치도 완벽한 것이 아니다. 실제로 책정치가 10%정도 저렴하게 측정하기에 이런 회사들은 주어진 구역에 대한 구역의 중간 값을 예측 하는 모델을 학습시키기를 원하는 것이다. 인구조사 데이터 세트는 수천개의 구역의 중간 집 값 정보를 포함하고 있기 때문에 이러한 목적에 활용하기 딱 좋은 데이터 세트이다. 
 
@@ -49,7 +51,7 @@
 ## 사용할 수행 측정치를 정하자
 다음 단계로는 수행을 측정할 수 있는 방법을 고르는 것이다. 회귀 문제에 대하여 전형적인 수행 측정도는 Root Mean Square Error(RMSE:평균 제곱근 오차) 기법이다. 이는 예측을 수행할 때 얼마나 많은 에러가 시스템에 일반적으로 만들어지는지를 알 수 있는 아주 좋은 아이디어이다. RMSE를 연산하는 수학적 공식은 다음과 같다.
 ###### Equation 2-1. Root Mean Square Error(RMSE:평균 제곱근 오차)
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/Eq2-1.png)
+![](../Book_images/02/Eq2-1.png)
 * 표기법
 
   이 공식은 우리가 이 책을 진행하면서 몇몇 기본적인 기계학습 표기법을 소개한다.
@@ -58,12 +60,12 @@
   * *x^(i)* 는 데이터 셋에서 *i*번째에 대한 (레이블 제외) 모든 특징 값들에 대한 벡터 값이다. *y^(i)* 는 이에 대한 레이블(예시에 대한 바람직한 값) 값이다.
     - 예를 들어, 데이터 세트의 첫번째의 경도가 -118.29도, 위도가 33.91도이며, 1416명의 거주자가 사는 동네의 중간의 소득값이 $38,372이며 이 지역의 중간 집 값이 $156,400이라면 다음과 같이 표기될 것이다.
 
-      ![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/Notation1-1.png)    ![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/Notation1-2.png)
+      ![](../Book_images/02/Notation1-1.png)    ![](../Book_images/02/Notation1-2.png)
 
   * *X* 는 (레이블 제외) 데이터 세트에서 모든 경우에 대한 모든 특징의 값을 가지고 있는 행렬이다. 한 열당 예시 하나가 들어가 있으며 i번째 열은 
  *X^(i)* 를 전치한 전치행렬이다. 
     - 예를 들어, 첫번째 구역이 위에서 묘사했던 것처럼 되어있다면, 행렬 *X* 는 다음과 같을 것이다.
-      ![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/Notation1-3.png)
+      ![](../Book_images/02/Notation1-3.png)
 
   * *h* 는 시스템의 예측함수이며, 추측(hypothesis)라고 한다. 시스템이 어떤 경우에 대한 특징 벡터 *x^(i)* 가 주어지면, 그 경우에 대한 예측값 *y-hat^(1) = h(x^(i))* 를 출력한다.
     - 예를 들어, 
@@ -73,7 +75,7 @@
 
 RMSE가 일반적으로 회귀 문제에서 많이 쓰이는 수행 측정 지표일지라도, 다른 상황에서는 다른 종류의 함수를 쓰는 것이 더 좋을 수도 있다. 예를들어, 수많은 이상점인 구역들이 있다. 이러한 경우는, Mean Absolute Error라는 함수의 사용을 고려해볼지모른다. (Average Absolute Devidation, 절대평균편차라고도 한다)
 ###### Equation 2-2. 절대 평균 편차
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/Eq2-2.png)
+![](../Book_images/02/Eq2-2.png)
 
 RMSE, MAE 둘 다 두 벡터, 예측값 벡터와 레이블값 벡터 사이의 거리를 측정하는 것이다. 그리고 측정법에는 여러가지 측정법과 Norm이 존재한다.
 
@@ -135,12 +137,14 @@ $ jupyter notebook
 ```
 
 그렇다면 이제 포트 8888로 Jupyter 서버가 실행이 된 것이다! 이제 브라우저에 새 창이 뜨고 아까 만들어두었던 환경 파일 env가 보일 것이다. 이제 Python Notebook을 만들어보자. 우측 상단의 `New`라는 버튼을 클릭해서 Python3를 선택하면 새롭게 파일을 생성할 수 있다. (아래 그림 참고)
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-3.png)
+###### 그림 2-3. Jupyter에서의 작업환경
+![](../Book_images/02/2-3.png)
 
 Notebook은 Cell이라고하는 박스의 리스트이다. 각 Cell에는 실행가능한 코드나 일반 평서문등을 넣을 수 있다.
 Cell 1번에 `print("hello world")`를 입력하고 실행해보아라. 우측 중앙에 플레이 버튼처럼 생긴 버튼을 누르면 선택한 Cell의 코드를 실행시킬 수 있다. 아니면 Shift + Enter로도 실행이 가능하다.
 
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-4.png)
+###### 그림 2-4. Python Notebook상에서 Hello wolrd 출력해보기
+![](../Book_images/02/2-4.png)
 
 Jupyter Notebook을 좀 더 체험해보고 싶다면 Help 메뉴에 있는 `User interface tour`를 사용해보자
 
@@ -186,12 +190,14 @@ def load_housing_data(housing_path=HOUSING_PATH):
 
 ## 데이터 구조 빠르게 훑어보기
 DataFrame의 `head()`함수를 사용하여 한번 최상위 5개 열을 조회해보자.
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-5.png)
+###### 그림 2-5. 데이터 세트에 있는 상위 5개 행들
+![](../Book_images/02/2-5.png)
 
 각각의 열은 하나의 구역을 나타낸다. 여기서 총 10개의 요소(Attribute)를 볼 수 있다.
 
 `info()`함수는 데이터에 대한 빠른 설명을 얻는데 도움이 된다. 일반적으로, 열의 수, 각 attribute의 자료형, 값이 비어있지 않은 것의 개수를 표시해준다.
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-6.png)
+###### 그림 2-6. 하우징 데이터 정보
+![](../Book_images/02/2-6.png)
 
 데이터 셋에는 20640개의 예시가 존재하며, 기계학습 표준으로는 턱없이 부족하나, 초보에게 시작하기에는 딱 좋다. `total_bedrooms` 요소는 비어있지 않은 곳이 20433개이며 이는 207개의 구역에서 특징이 없다는 것을 의미한다. 이는 후에 다룰 필요가 있다.
 
@@ -208,14 +214,14 @@ ISLAND           5
 Name: ocean_proximity, dtype: int64
 ```
 한 번 다른 것도 보자. `describe()` 함수가 이를 출력해서 보여줄 것이다.
-
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-7.png)
+###### 그림 2-7. 각각 숫자로 된 속성값 요약
+![](../Book_images/02/2-7.png)
 
 `mean`, `min`, `max`는 따로 설명이 필요 없을 것이다. 그리고 Null 데이터는 무시될 수 있음을 알아두어라. `std`열은 표준편차(standard deviation)를 보여주며, 이는 값들이 얼마나 퍼져있는지를 표시해준 것이다. 25%, 50%, 75%는 백분율(percentiles)를 나타낸 것으로, 25%의 구역은 `Housing Median Age`가 18 이하이고, 50%는 29이하, 75%는 37이하이다. 이는 종종 25th percentile(1st quartile), 중간, 75th percentile(3st quartile)이라도 불린다. 
 
 우리가 다루는 데이터의 타입에 대해 느낌을 받는 또 다른 방법은 각각의 숫자 요소들에 대해서 히스토그램을 plot하는 것이다. 히스토그램은 주어진 값의 법위(수평축)에 대한 예시의 수(수직축)를 나타낸다. 아니면 요소 하나당 점 하나로 찍는 방법도 있으며, 혹은 전체 데이터에 대해 `hist()`함수를 불러오는 것이다. 이는 각 숫자 요소들에 대해 히스토그램은 만들 것이다.
-
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-8.png) 
+###### 그림 2-8. 각각 숫자로 된 속성값ㅇ에 대한 히스토그램
+![](../Book_images/02/2-8.png) 
 
 예를 들어, 약 800개 이상의 지역이 `median_house_value`로 약 $100,000이라는 것을 볼 수 있다.
 ```
@@ -301,7 +307,8 @@ housing["income_cat"] = np.ceil(housing["median_income"] / 1.5)
 # 5이상을 5라고 레이블 한다.
 housing["income_cat"].where(housing["income_cat"] < 5, 5.0, inplace=True)
 ```
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-9.png)
+###### 그림 2-9. 수입 카테고리의 히스토그램
+![](../Book_images/02/2-9.png)
 
 이제 소득 카테고리를 기반으로 하여 계층화 샘플링을 할 수 있게 되었다. 한번 Scikit-Learn의 `StratifiedShuffleSplit`클래스를 사용해보자.
 ```
@@ -326,8 +333,8 @@ for train_index, test_index in split.split(housing, housing["income_cat"]):
 Name: income_cat, dtype: float64
 ```
 비슷한 코드로, 실험 데이터 세트에 소득 카테고리 비율을 측정해서 볼 수 있다. 이는 Jupyter notebook코드에 잘 구현되어있다. 아래의 그래프는 다양한 방법들과 계층화 샘플링을 전체 데이터 세트에 대한 소득 카테고리 비율과 비교해볼 수 있다.
-
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-10.png)
+###### 그림 2-10. 순수 랜덤 샘플링과 계층화시킨 샘플링에 대한 샘플링 편향치 비교
+![](../Book_images/02/2-10.png)
 
 이제 `income_cat` 요소를 제거해서 데이터 세트의 원래 상태로 되돌아 갈 수 있도록 한다.
 ```
@@ -350,14 +357,16 @@ housing = strat_train_set.copy()
 housing.plot(kind="scatter", x="longitude", y="latitude")
 save_fig("bad_visualization_plot")
 ```
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-11.png)
+###### 그림 2-11. 데이터를 지리학적으로 점찍은 그래프
+![](../Book_images/02/2-11.png)
 
 딱봐도 캘리포니아 처럼 생겼지만, 어떠한 특정 패턴을 발견하기는 어렵다. `alpha`라는 옵션에 0.1이라고 설정해주면 데이터 밀도가 높은 지역을 시각화 하기 좋다.
 ```
 housing.plot(kind="scatter", x="longitude", y="latitude", alpha=0.1)
 save_fig("better_visualization_plot")
 ```
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-12.png)
+###### 그림 2-12. 높은 밀도 지역을 강조해줄 수 있도록 한 시각화 그래프
+![](../Book_images/02/2-12.png)
 
 좀 더 일반적으로, 우리의 뇌는 사진에서 패턴을 잘 알아챈다. 하지만 우리는 패턴이 좀 더 눈에 띠게 시각화 파라미터를 좀 더 가지고 놀아볼 것이다.
 
@@ -370,8 +379,8 @@ housing.plot(kind="scatter", x="longitude", y="latitude", alpha=0.4,
 plt.legend()
 save_fig("housing_prices_scatterplot")
 ```
-
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-13.png)
+###### 그림 2-13. 캘리포니아 집 값
+![](../Book_images/02/2-13.png)
 
 위의 이미지는 우리도 잘 알다시피, 인구 밀도와, 지형적 특정이 집 값과 매우 연관성이 높다는 것을 말해주고 있다. 이는 주군집을 찾는 클러스터링 알고리즘에 사용하기 유용할 것이고, 클러스터의 중심과의 가까움 정도를 측정하는 새로운 특징을 추가하기에도 유용할 것이다. 비록 북쪽 해안에 있는 집 값이 높은 편은 않지만 해안과의 거리를 나타내는 요소도 유용할 것이다.
 
@@ -397,6 +406,8 @@ latitude             -0.142724
 Name: median_house_value, dtype: float64
 ```
 상관 계수는 -1부터 1로 정의되는데 1에 가까울 수록 강한긍정, -1에 가까울수록 강한 부정(위도가 북쪽으로 갈수록 집 값이 낮아짐)을 나타내게 되며, 0에 가까운 숫자들은 선형적인 관계로 나타내기 힘들다는 것을 의미한다. 
+###### 그림 2-14. 다양한 데이터 세트에 대한 표준상관계수 
+![](../Book_images/02/2-14.png)
 
 요소간 상관관계를 확인하는 또한다른 방법은 Pandas의 `scatter_matrix`함수인데 이는 모든 숫자 요소들간의 관계를 점찍어서 보여주는 함수이다. 그림은 아래에 있으며 코드는 다음과 같다.
 ```
@@ -408,7 +419,8 @@ attributes = ["median_house_value", "median_income", "total_rooms",
 scatter_matrix(housing[attributes], figsize=(12, 8))
 save_fig("scatter_matrix_plot")
 ```
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-15.png)
+###### 그림 2-15. Scatter Matrix
+![](../Book_images/02/2-15.png)
 
 최상단 좌측에서 최하단 우측으로 가는 대각선 상에 있는 데이터들은 히스토그램으로 나와있는데, 이는 자기자신에 대해 자기자신의 상관관계를 나타낸 것으로 즉 그냥 자기 자신을 나타내는 것이기에 자신의 값을 표현하는 히스토그램으로 표시되는 것이다.
 
@@ -418,7 +430,8 @@ housing.plot(kind="scatter", x="median_income", y="median_house_value",
              alpha=0.1)
 ```
 이 plot은 몇가지 특징을 보여준다. 먼저, 서로의 상관관계가 매우 강하다는 것이다. 위로 향하면서 밀도가 분산되어있지도 않다. 그리고 두번째로 우리가 전에 보았던 데이터 계층화를 총해 만든 것과 비슷해 보이는 $50,000의 선이 보인다. 하지만 $35,000과 $45,000에서도 수평선이 생성되어 있고, $28,000쯔음에도 선이 있는 것처럼 보인다. 데이터를 우리의 알고리즘에 학습시킬 때 이런 이상한 데이터들을 제거할 수 있으면 학습의 성능을 위해서라도 제거하는 것이 좋다.
-![](https://github.com/Hahnnz/handson_ml-Kor/blob/master/Book_images/02/2-16.png)
+###### 그림 2-16. 평균 입에 대한 평균 집 값
+![](../Book_images/02/2-16.png)
 
 ## 요소 조합 실험학기
 이전 섹션에서 데이터에 대한 이해를 얻기위해 데이터를 탐구하는 몇가지 아이디어를 살펴보았다. 이렇게 학습에 사용할 데이터에서 기이한 점들을 제거할 수 있고, 요소간 흥미로운 관계또한 확인할 수 있다. 그리고 꼬리가 무거운 분산을 가진 요소도 있음을 알았을 것이기에, 이를 변환해서 사용할 수 있을지 모른다고 생각할 수 있다. 
@@ -960,4 +973,4 @@ array([  7.33442355e-02,   6.29090705e-02,   4.11437985e-02,
 
 그래서 만약 아직 해보지 못했다면 노트북을 꺼내서 분석해보고 싶은 데이터세트를 골라보자. 그래서 처음부터 끝까지 전체 프로세스를 한번 경험해보는 것도 좋을 것이다. 시작하기 좋은 사이트로 [Kaggle](http://kaggle.com/)이라는 공모전 웹사이트가 있다. 여기서 여러분들은 데이터 세트를 직접 가지고 놀 수 있으며 목표를 향해 도전해볼 수도 있고, 사람들과 경헙을 나누어 볼 수도 있을 것이다.
 
-**[뒤로 돌아가기](https://github.com/Hahnnz/handson_ml-Kor/)**
+**[뒤로 돌아가기](../index.md)**
