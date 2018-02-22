@@ -225,14 +225,166 @@ RNN을 학습시키기 위해서는 우리가 했던 것처럼 시간에 따라 
 ###### 그림 14-5. 시간기반역전파(*Backpropagation through time*)
 ![](../Book_images/14/14-5.png)
 
-이전의 역전파처럼, 먼저 풀어헤친 신경망을 순방향으로 진행을 시켜준 뒤에, 연속 출력값이 손실함수![](https://render.githubusercontent.com/render/math?math=C%28%5Cmathbf%7BY%7D_%7B%28t_%5Ctext%7Bmin%7D%29%7D%2C%20%5Cmathbf%7BY%7D_%7B%28t_%5Ctext%7Bmin%7D%2B1%29%7D%2C%20%5Cdots%2C%20%5Cmathbf%7BY%7D_%7B%28t_%5Ctext%7Bmax%7D%29%7D%29&mode=inline)(t_min과 t_max는 시간 스탭의 처음과 마지막 출력, 무시된 출력값은 제외)를 사용해서 평가를 진행하고, 손실함수의 기울기 값은 풀어헤친 신경망에 역방향으로 전파되게 된다.
-
+이전의 역전파처럼, 먼저 풀어헤친 신경망을 순방향으로 진행을 시켜준 뒤에, 연속 출력값이 손실함수![](https://render.githubusercontent.com/render/math?math=C%28%5Cmathbf%7BY%7D_%7B%28t_%5Ctext%7Bmin%7D%29%7D%2C%20%5Cmathbf%7BY%7D_%7B%28t_%5Ctext%7Bmin%7D%2B1%29%7D%2C%20%5Cdots%2C%20%5Cmathbf%7BY%7D_%7B%28t_%5Ctext%7Bmax%7D%29%7D%29&mode=inline)(t_min과 t_max는 시간 스탭의 처음과 마지막 출력, 무시된 출력값은 제외)를 사용해서 평가를 진행하고, 손실함수의 기울기 값은 풀어헤친 신경망에 역방향으로 전파되게 된다. 그래디언트는 손실함수에서 사용된 모든 출력 계층을 통해 역방향으로 진행되고 마치막 출력을 통해서 되는 것이 아님을 알아야한다. 예를들어 그림 14-5에서 손실함수는 신경망에서 3개의 출력 **Y_(2)**, **Y_(3)**, **Y_(4)** 로  연산되어 그래디언트는 이 세 개의 출력으로 흘러들어가게되지만 **Y_(0)**, **Y_(1)** 에는 들어가지 않는다. 더 나아가 같은 **W**와 **b**가 각각의 시간 스탭에서 사용이 되기 때문에 역전파는 잘 작동할 것이며 이런 시간 스탭들을 모두 더하게 된다.
 ## Sequence 분류모델 학습시키기
+MNIST 이미지 데이터를 분류하는 RNN을 학습시켜보자. 컨볼루션 신경망이 이미지 분류에서는 더 잘 작동하겠지만, 우리가 알고 있는 친근한 데이터로 접근해볼 것이다. 우리는 28행에 28픽셀로 다루어 볼 것이다. (MNIST 데이터 세트의 이미지 크기가 28x28이기 때문임) 우리는 150개의 순환 뉴런의 셀을 사용할 것이고, 게다가 10개 뉴런을 포함하는 마지막 최종 출력과 연결되어있는 전가산계층도 더해줄 것이고, 그 뒤에는 소프트맥스 계층을 붙여줄 것이다.
+###### 그림 14-6 Sequence 분류 모델
+![](../Book_images/14/14-6.png)
 
+구현 단계는 꽤나 쉽게 구현할 수 있다 은닉계층을 풀어진 RNN으로 바꾸어주어 우리가 Chapter 10에서 구현한 MNIST 분류모델과 꽤나 비슷하다. 전가산층은 `states`텐서와 연결되어 있으며, 이는 RNN의 최종 상태(28번째 출력)만을 저장하고 있다. 또한 `y`는 타겟 클래스에 대한 플레이스 홀더이다.
+```
+n_steps = 28
+n_inputs = 28
+n_neurons = 150
+n_outputs = 10
 
+learning_rate = 0.001
 
+X = tf.placeholder(tf.float32, [None, n_steps, n_inputs])
+y = tf.placeholder(tf.int32, [None])
 
+basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons)
+outputs, states = tf.nn.dynamic_rnn(basic_cell, X, dtype=tf.float32)
 
+logits = tf.layers.dense(states, n_outputs)
+xentropy = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=y,
+                                                          logits=logits)
+loss = tf.reduce_mean(xentropy)
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+training_op = optimizer.minimize(loss)
+correct = tf.nn.in_top_k(logits, y, 1)
+accuracy = tf.reduce_mean(tf.cast(correct, tf.float32))
+
+init = tf.global_variables_initializer()
+```
+이제 MNIST 데이터 세트를 불러오고 테스트 데이터 세트를 `[ batch_size, n_steps, n_inputs ]`로 신경망이 받아들일 수 있도록 형태를 재조정한다. 곧 학습 데이터를 재조정하는 것도 해볼 것이다.
+```
+from tensorflow.examples.tutorials.mnist import input_data
+
+mnist = input_data.read_data_sets("/tmp/data/")
+X_test = mnist.test.images.reshape((-1, n_steps, n_inputs))
+y_test = mnist.test.labels
+```
+이제 RNN을 학습시킬 준비가 되었다. 실행 단계에서는 우리가 신경망에 넣기 전에 각각의 학습 배치들의 크기를 재조정했다는 것만 빼면 정확하게 chapter 10에서 했던것과 동일하다. 
+```
+n_epochs = 100
+batch_size = 150
+
+with tf.Session() as sess:
+    init.run()
+    for epoch in range(n_epochs):
+        for iteration in range(mnist.train.num_examples // batch_size):
+            X_batch, y_batch = mnist.train.next_batch(batch_size)
+            X_batch = X_batch.reshape((-1, n_steps, n_inputs))
+            sess.run(training_op, feed_dict={X: X_batch, y: y_batch})
+        acc_train = accuracy.eval(feed_dict={X: X_batch, y: y_batch})
+        acc_test = accuracy.eval(feed_dict={X: X_test, y: y_test})
+        print(epoch, "Train accuracy:", acc_train, "Test accuracy:", acc_test)
+```
+출력은 다음과 같을 것이다.
+```
+0 Train accuracy: 0.946667 Test accuracy: 0.9366
+1 Train accuracy: 0.966667 Test accuracy: 0.9488
+[...]
+98 Train accuracy: 0.993333 Test accuracy: 0.9788
+99 Train accuracy: 1.0 Test accuracy: 0.9792
+```
+98%정도의 정확도를 얻었다. 나쁘지 않다! 게다가 분명히 하이퍼 파라미터를 조율하고 HE 초기화를 사용해서 RNN 가중치들을 초기화해주고, 학습을 더 길게하고 드랍아웃 같은 정형화 알고리즘도 사용했다면 더 좋았을 것이다.
+```
+구현 단계에서 variable_scope 부분에 initializer=variable_scaling_initializer()라고 
+인자를 설정해주면 HE 초기화 전략을 사용할 수 있다.
+```
+## 시계열 예측 학습
+이제 한번 주식 가격이나 대기 온도, 뇌파 패턴과 같은 시계열 데이터를 다루어 보자. 이번 섹션에서는 생성된 시계열 데이터에서 다음 값을 예측하도록 RNN을 학습시켜볼 것이다. 각각의 학습 인스턴스는 임의로 시계열 데이터에서 20개의 연속적인 값들을 뽑아낸 것으로, 타겟 Sequence는 연속 입력값에서 미래에 대한 시간 스탭이 한 개 더 나아간 것을 빼면 완전 동일하다. 아래 그림을 참고하자.
+###### 그림 14-7. 시계열 데이터(왼쪽), 시계열에 따른 학습 인스턴스 (오른쪽)
+![](../Book_images/14/14-7.png)
+
+먼저 RNN을 만든다. 이는 100개의 순환 뉴런을 가지며, 학습 인스턴스가 20개의 길이로 들어가기에 20개의 시간 스탭으로 풀어 헤쳐준다. 각각의 입력들은 오직 하나의 특징값을 가지고 있다. 타겟값은 또한 20개의 입력값으로 각각이 단일의 값을 가지며 코드는 이전에 한 것과 거의 흡사하다.
+```
+X = tf.placeholder(tf.float32, [None, n_steps, n_inputs])
+y = tf.placeholder(tf.float32, [None, n_steps, n_outputs])
+
+cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu)
+outputs, states = tf.nn.dynamic_rnn(cell, X, dtype=tf.float32)
+```
+```
+일반적으로 우리는 하나의 입력 특징 이상을 가진다. 예를들어, 주식의 가격을 예측하고자 한다면, 경쟁 주식 가격등등의 시스템이
+예측을 내리는데 도움이 될만한 특징값들을 각각의 시간 스탭마다 특징값으로 넣어줄 것이다.
+```
+각각의 시간 스탭에서 우리는 이제 크기 100의 출력 벡터를 가진다. 하지만 우리가 실제로 원하는 것은 각각의 시간 스탭에서의 단일 출력 값이다. 가장 간단한 해법은 `OutputProjectionWrapper`로 셀을 덮는 것이다. 셀을 덮어주는 함수는 근본적인 셀에 모든 기법의 셀들로 대리역을 맡으면서 평범한 셀처럼 행동하지만, 추가적인 일부 기능이 더 있다. `OutputProjectionWrapper`는 각각 출력 위에 (어떠한 활성화 함수 없이) 선형 뉴런의 전가산층을 추가해준다.(하지만 셀 상태에는 영향을 끼치지 않는다) 모든 이러한 전가산층들은 같은 (학습이 가능한) 가중치와 편향치를 공유한다. 이렇게 나오는 RNN은 아래의 그림으로 나와있다.
+###### 그림 14-8. 출력값 투영법을 사용한 RNN 셀
+![](../Book_images/14/14-8.png)
+
+셀을 포장한다는 것은 꽤나 쉽다. `BasicRNNCell`를 `OperationProjectionWrapper`로 덮어보면서 이전 코드를 조금 조절해보자.
+```
+cell = tf.contrib.rnn.OutputProjectionWrapper(
+    tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu),
+    output_size=n_outputs)
+```
+이제 우리는 손실함수를 정의해주어야한다. 우리는 이전의 회귀 기능에서 했던 것처럼 MSE를 사용할 것이다. 다음으로 우리는 Adam 최적화 함수와 학습 op, 그리고 변수 초기화 op을 만든다.
+```
+learning_rate = 0.001
+
+loss = tf.reduce_mean(tf.square(outputs - y)) # MSE
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+training_op = optimizer.minimize(loss)
+
+init = tf.global_variables_initializer()
+```
+이제 실행 단계로 가보자
+```
+n_iterations = 1500
+batch_size = 50
+
+with tf.Session() as sess:
+    init.run()
+    for iteration in range(n_iterations):
+        X_batch, y_batch = next_batch(batch_size, n_steps)
+        sess.run(training_op, feed_dict={X: X_batch, y: y_batch})
+        if iteration % 100 == 0:
+            mse = loss.eval(feed_dict={X: X_batch, y: y_batch})
+            print(iteration, "\tMSE:", mse)
+```
+이 프로그램의 결과는 다음과 같이 보일 것이다.
+```
+0 	MSE: 18.9177
+100 	MSE: 0.762551
+200 	MSE: 0.290907
+300 	MSE: 0.149525
+400 	MSE: 0.0772763
+[...]
+```
+모델이 학습되고 나면 이제 예측 결과를 뽑아볼 수 있다.
+```
+X_new = [...] # New Sequences
+y_pred = sess.run(outputs, feed_dict={X: X_new})
+```
+그림 14-9는 학습 1000회 반복 후 우리가 그림 14-7에서 보았던 인스턴스에 대해서 예측한 결과를 보여준다.
+
+비록 `OutputProjectionWrapper`를 사용하는 것이 시간 스탭당(인스턴스당) 하나의 값으로 RNN의 연속 출력 값의 차원수를 줄여주는 좋은 해답일지 모르지만 제일 효율적인 방법은 아니다. 좀 더 기법적이면서도 더 효과적인 방법이 있다. RNN의 출력 크기를 `[ batch_size, n_steps, n_neurons ]`에서 `[ batch_size * n_steps, n_neurons ]`로 재조정 해주고 적절한 출력 크기(우리의 경우에는 1)로 단일 전가산계층을 적용해주는데, 이는 출력 텐서의 크기가 `[ batch_size * n_steps, n_neurons ]`로 나올 것이며 그 후에는 다시 `[ batch_size, n_steps, n_neurons ]`의 텐서로 재조정 될 것이다. 이러한 연산은 그림 14-10에 자세히 나와있다.
+###### 그림 14-9. 시계열 예측
+![](../Book_images/14/14-9.png)
+###### 그림 14-10. 모든 출력을 쌓아(stack), 투영법을 적용하고, 쌓인 결과값을 풀어줌(unstack)
+![](../Book_images/14/14-10.png)
+
+이 솔루션을 구현하기 위해서는 먼저 우리는 `OutputProjectionWrapper`를 없앤 기본 셀로 되돌려주어야한다.
+```
+cell = tf.contrib.rnn.BasicRNNCell(num_units=n_neurons, activation=tf.nn.relu)
+rnn_outputs, states = tf.nn.dynamic_rnn(cell, X, dtype=tf.float32)
+```
+그리고나서 `reshape()`연산을 사용해모든 출력들을 stack하고 어떠한 활성화 함수를 사용하지 않고 전가산 선형 계층을 적용한다. 그리고 마지막으로 이 모든 출력들을 `reshape()`연산을 사용해서 unstack해준다.
+```
+stacked_rnn_outputs = tf.reshape(rnn_outputs, [-1, n_neurons])
+stacked_outputs = tf.layers.dense(stacked_rnn_outputs, n_outputs)
+outputs = tf.reshape(stacked_outputs, [-1, n_steps, n_outputs])
+```
+코드의 나머지 부분들은 이전의 것들과 같다. 이는 상당한 속도 향상을 가져다주는데, 시간 스탭당 하나의 전가산층이 들어간 것에 비해 전가산층이 모델 통틀어 하나만 들어갔기 때문이다.
+## 창의적인 RNN (Creative RNN)
+이제 미래를 예측할 수 있는 모델을 가지고 있으니, 이 Chapter 맨 앞에서 설명했던 창의적인 연속값들을 만들어 낼 수 있다. 우리가 해야할 것은 `n_stpes` 값들을 포함한 Seed Sequence를 넣어주고, 예측된 값을 Sequence의 끝에 붙여, 다음의 값을 예측하기 위해 모델의 마지막 `n_steps`에 넣어주는 식으로 계속 진행을 한다. 이러한 과정은 시계열 원본 데이터와 꽤 유사한 새로운 시계열 데이터를 만들어 낸다. 아래 그림을 참고하자.
+###### 그림 14-11. 만들어진 Sequence. 0으로 시드 설정(왼쪽), 인스턴스로 설정(오른쪽)
+![](../Book_images/14/14-11.png)
+# 심층 순환 신경망 
+랄랄라
 **[뒤로 돌아가기](../index.md)**
 
 **[위로 올라가기]()**
